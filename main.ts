@@ -10,14 +10,16 @@
  * +-----------------+
  * | . . . . . . L R | Sensors  (L=16, R=0)
  * +-----------------+
- * Using the new (as of 2026) microbit case from gigo
+ * Using the new (as of 2026) microbit case from gigo (the gray one)
+ * 
+ * NOTE: TIMINGS AND SPEED MAY BE DIFFER BASED ON BATTERY VOLTAGE, SURFACE TYPE, WHEEL TYPE, ETC
  */
 
 const Motor = {
     // 0-255
     MAX_SPEED: 80,
     // 0-255
-    BASE_SPEED: 45,
+    BASE_SPEED: 55,
     //[Control Pin, Speed Pin]
     LEFT: [AnalogPin.P2, AnalogPin.P1],
     RIGHT: [AnalogPin.P13, AnalogPin.P8],
@@ -104,7 +106,7 @@ const start = (route: Route) => {
 
     basic.pause(1000);
 
-    const Kp = Motor.BASE_SPEED * 3;
+    const Kp = Motor.BASE_SPEED * 3.5;
     const Ki = 0;
     const Kd = 0;
     let [P, I, D, lastError] = [0, 0, 0, 0];
@@ -166,36 +168,49 @@ const start = (route: Route) => {
 
     basic.showIcon(IconNames.No, 0);
 
+    const stop = (duration: number) => {
+        setMotor(Motor.LEFT, 0, 0);
+        setMotor(Motor.RIGHT, 0, 0);
+        basic.pause(duration);
+    }
+
+    stop(500);
+
     switch (route) {
         case "R":
             setMotor(Motor.LEFT, 0, Motor.MAX_SPEED);
-            setMotor(Motor.RIGHT, 0, Motor.MAX_SPEED);
-            basic.pause(500);
+            setMotor(Motor.RIGHT, 0, Motor.MAX_SPEED);  
+            basic.pause(1200);
+            stop(500);
             setMotor(Motor.LEFT, 0, Motor.BASE_SPEED);
             setMotor(Motor.RIGHT, 1, Motor.BASE_SPEED);
-            basic.pause(600);
+            basic.pause(700);
             break
         case "G":
             setMotor(Motor.LEFT, 0, Motor.BASE_SPEED);
             setMotor(Motor.RIGHT, 1, Motor.BASE_SPEED);
-            basic.pause(200);
+            basic.pause(500);
+            stop(500);
             setMotor(Motor.LEFT, 0, Motor.MAX_SPEED);
             setMotor(Motor.RIGHT, 0, Motor.MAX_SPEED);
-            basic.pause(700);
+            basic.pause(1500);
+            stop(500);
             setMotor(Motor.LEFT, 0, Motor.BASE_SPEED);
             setMotor(Motor.RIGHT, 1, Motor.BASE_SPEED);
-            basic.pause(550);
+            basic.pause(620);
             break
         case "B":
             setMotor(Motor.LEFT, 0, Motor.BASE_SPEED);
             setMotor(Motor.RIGHT, 1, Motor.BASE_SPEED);
             basic.pause(1450);
+            stop(500);
             setMotor(Motor.LEFT, 1, Motor.MAX_SPEED);
             setMotor(Motor.RIGHT, 1, Motor.MAX_SPEED);
-            basic.pause(700);
+            basic.pause(1050);
+            stop(500);
             setMotor(Motor.LEFT, 0, Motor.BASE_SPEED);
             setMotor(Motor.RIGHT, 1, Motor.BASE_SPEED);
-            basic.pause(600);
+            basic.pause(700);
             break
     }
 
