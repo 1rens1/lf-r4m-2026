@@ -10,9 +10,7 @@
  * +-----------------+
  * | . . . . . . L R | Sensors  (L=16, R=0)
  * +-----------------+
- * Using the new (as of 2026) microbit case from gigo (the gray one)
- * 
- * NOTE: TIMINGS AND SPEED MAY BE DIFFER BASED ON BATTERY VOLTAGE, SURFACE TYPE, WHEEL TYPE, ETC
+ * Using the new (as of 2026) microbit case from gigo
  */
 
 const Motor = {
@@ -179,12 +177,12 @@ const start = (route: Route) => {
     switch (route) {
         case "R":
             setMotor(Motor.LEFT, 0, Motor.MAX_SPEED);
-            setMotor(Motor.RIGHT, 0, Motor.MAX_SPEED);  
+            setMotor(Motor.RIGHT, 0, Motor.MAX_SPEED);
             basic.pause(1200);
             stop(500);
             setMotor(Motor.LEFT, 0, Motor.BASE_SPEED);
             setMotor(Motor.RIGHT, 1, Motor.BASE_SPEED);
-            basic.pause(700);
+            basic.pause(750);
             break
         case "G":
             setMotor(Motor.LEFT, 0, Motor.BASE_SPEED);
@@ -193,7 +191,7 @@ const start = (route: Route) => {
             stop(500);
             setMotor(Motor.LEFT, 0, Motor.MAX_SPEED);
             setMotor(Motor.RIGHT, 0, Motor.MAX_SPEED);
-            basic.pause(1500);
+            basic.pause(1600);
             stop(500);
             setMotor(Motor.LEFT, 0, Motor.BASE_SPEED);
             setMotor(Motor.RIGHT, 1, Motor.BASE_SPEED);
@@ -206,7 +204,7 @@ const start = (route: Route) => {
             stop(500);
             setMotor(Motor.LEFT, 1, Motor.MAX_SPEED);
             setMotor(Motor.RIGHT, 1, Motor.MAX_SPEED);
-            basic.pause(1050);
+            basic.pause(1150);
             stop(500);
             setMotor(Motor.LEFT, 0, Motor.BASE_SPEED);
             setMotor(Motor.RIGHT, 1, Motor.BASE_SPEED);
