@@ -17,7 +17,8 @@ const Motor = {
     // 0-255
     MAX_SPEED: 80,
     // 0-255
-    BASE_SPEED: 55,
+    BASE_SPEED: 50,
+    TURN_SPEED: 100,
     //[Control Pin, Speed Pin]
     LEFT: [AnalogPin.P2, AnalogPin.P1],
     RIGHT: [AnalogPin.P13, AnalogPin.P8],
@@ -90,6 +91,12 @@ let wasOnBothLineCounter = 0;
 let timeSinceLastOnBothLine = 0;
 let maxSpeedBumpCounter = 0;
 
+const stopAndWait = (duration: number = 300) => {
+    setMotor(Motor.LEFT, 0, 0);
+    setMotor(Motor.RIGHT, 0, 0);
+    basic.pause(duration);
+}
+
 const start = (route: Route) => {
     // Reset state variables every start
     wasOnBothLine = false;
@@ -104,7 +111,7 @@ const start = (route: Route) => {
 
     basic.pause(1000);
 
-    const Kp = Motor.BASE_SPEED * 3.5;
+    const Kp = Motor.BASE_SPEED * 2.5;
     const Ki = 0;
     const Kd = 0;
     let [P, I, D, lastError] = [0, 0, 0, 0];
@@ -124,7 +131,18 @@ const start = (route: Route) => {
         } else if (!leftOnLine && rightOnLine) { // drifting left
             error = -1;
             wasOnBothLine = false;
-        } else if (leftOnLine && rightOnLine) { // both line
+        } else if (leftOnLine && rightOnLine) { // possible both line
+            basic.pause(10);
+
+            const leftStillOnLine = Sensor.isOnLine(Sensor.LEFT);
+            const rightStillOnLine = Sensor.isOnLine(Sensor.RIGHT);
+
+            if (!(leftStillOnLine && rightStillOnLine)) {
+                wasOnBothLine = false;
+                continue;
+            }
+
+            // confirmed both line
             let shouldBreak = true;
 
             if (!wasOnBothLine) {
@@ -140,9 +158,10 @@ const start = (route: Route) => {
 
                     if (!wasOnBothLine && maxSpeedBumpCounter < 2) {
                         maxSpeedBumpCounter++;
+                        stopAndWait(150);
                         setMotor(Motor.LEFT, 0, Motor.MAX_SPEED);
                         setMotor(Motor.RIGHT, 1, Motor.MAX_SPEED);
-                        basic.pause(200);
+                        basic.pause(150);
                     }
                 }
             }
@@ -166,49 +185,47 @@ const start = (route: Route) => {
 
     basic.showIcon(IconNames.No, 0);
 
-    const stop = (duration: number) => {
-        setMotor(Motor.LEFT, 0, 0);
-        setMotor(Motor.RIGHT, 0, 0);
-        basic.pause(duration);
-    }
+    stopAndWait();
 
-    stop(500);
-
+    // SCRIPTED
     switch (route) {
         case "R":
-            setMotor(Motor.LEFT, 0, Motor.MAX_SPEED);
-            setMotor(Motor.RIGHT, 0, Motor.MAX_SPEED);
-            basic.pause(1200);
-            stop(500);
+            setMotor(Motor.LEFT, 1, Motor.BASE_SPEED);
+            setMotor(Motor.RIGHT, 0, Motor.BASE_SPEED);
+            basic.pause(400);
+            setMotor(Motor.LEFT, 0, Motor.TURN_SPEED);
+            setMotor(Motor.RIGHT, 0, Motor.TURN_SPEED);
+            basic.pause(900);
+            stopAndWait();
             setMotor(Motor.LEFT, 0, Motor.BASE_SPEED);
             setMotor(Motor.RIGHT, 1, Motor.BASE_SPEED);
-            basic.pause(750);
+            basic.pause(300);
             break
         case "G":
+            setMotor(Motor.LEFT, 1, Motor.BASE_SPEED);
+            setMotor(Motor.RIGHT, 0, Motor.BASE_SPEED);
+            basic.pause(600);
+            stopAndWait();
+            setMotor(Motor.LEFT, 0, Motor.TURN_SPEED);
+            setMotor(Motor.RIGHT, 0, Motor.TURN_SPEED);
+            basic.pause(900);
+            stopAndWait();
             setMotor(Motor.LEFT, 0, Motor.BASE_SPEED);
             setMotor(Motor.RIGHT, 1, Motor.BASE_SPEED);
-            basic.pause(500);
-            stop(500);
-            setMotor(Motor.LEFT, 0, Motor.MAX_SPEED);
-            setMotor(Motor.RIGHT, 0, Motor.MAX_SPEED);
-            basic.pause(1600);
-            stop(500);
-            setMotor(Motor.LEFT, 0, Motor.BASE_SPEED);
-            setMotor(Motor.RIGHT, 1, Motor.BASE_SPEED);
-            basic.pause(620);
+            basic.pause(150);
             break
         case "B":
             setMotor(Motor.LEFT, 0, Motor.BASE_SPEED);
             setMotor(Motor.RIGHT, 1, Motor.BASE_SPEED);
-            basic.pause(1450);
-            stop(500);
-            setMotor(Motor.LEFT, 1, Motor.MAX_SPEED);
-            setMotor(Motor.RIGHT, 1, Motor.MAX_SPEED);
-            basic.pause(1150);
-            stop(500);
+            basic.pause(700);
+            stopAndWait();
+            setMotor(Motor.LEFT, 1, Motor.TURN_SPEED);
+            setMotor(Motor.RIGHT, 1, Motor.TURN_SPEED);
+            basic.pause(800);
+            stopAndWait();
             setMotor(Motor.LEFT, 0, Motor.BASE_SPEED);
             setMotor(Motor.RIGHT, 1, Motor.BASE_SPEED);
-            basic.pause(700);
+            basic.pause(200);
             break
     }
 
